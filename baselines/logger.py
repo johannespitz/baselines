@@ -157,7 +157,7 @@ class TensorBoardOutputFormat(KVWriter):
 
     def writekvs(self, kvs):
         def summary_val(k, v):
-            kwargs = {'tag': k, 'simple_value': float(v)}
+            kwargs = {'tag': k, 'simple_value': float(v or 0)}
             return self.tf.Summary.Value(**kwargs)
         summary = self.tf.Summary(value=[summary_val(k, v) for k, v in kvs.items()])
         event = self.event_pb2.Event(wall_time=time.time(), summary=summary)
