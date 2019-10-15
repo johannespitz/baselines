@@ -14,6 +14,7 @@ common_kwargs = dict(
 learn_kwargs = {
     'a2c': {},
     'ppo2': dict(nsteps=10, ent_coef=0.0, nminibatches=1),
+    'ppo_c': dict(nsteps=10, ent_coef=0.0, nminibatches=1),
     # TODO enable sequential models for trpo_mpi (proper handling of nbatch and nsteps)
     # github issue: https://github.com/openai/baselines/issues/188
     # 'trpo_mpi': lambda e, p: trpo_mpi.learn(policy_fn=p(env=e), env=e, max_timesteps=30000, timesteps_per_batch=100, cg_iters=10, gamma=0.9, lam=1.0, max_kl=0.001)

@@ -17,13 +17,14 @@ learn_kwargs = {
     'deepq': {},
     'ddpg': dict(layer_norm=True),
     'ppo2': dict(lr=1e-3, nsteps=64, ent_coef=0.0),
+    'ppo_c': dict(lr=1e-3, nsteps=64, ent_coef=0.0),
     'trpo_mpi': dict(timesteps_per_batch=100, cg_iters=10, gamma=0.9, lam=1.0, max_kl=0.01)
 }
 
 
-algos_disc = ['a2c', 'acktr', 'deepq', 'ppo2', 'trpo_mpi']
-algos_multidisc = ['a2c', 'acktr', 'ppo2', 'trpo_mpi']
-algos_cont = ['a2c', 'acktr', 'ddpg',  'ppo2', 'trpo_mpi']
+algos_disc = ['a2c', 'acktr', 'deepq', 'ppo2', 'ppo_c', 'trpo_mpi']
+algos_multidisc = ['a2c', 'acktr', 'ppo2', 'ppo_c', 'trpo_mpi']
+algos_cont = ['a2c', 'acktr', 'ddpg',  'ppo2', 'ppo_c', 'trpo_mpi']
 
 @mark_slow
 @pytest.mark.parametrize("alg", algos_disc)

@@ -19,6 +19,7 @@ learn_kwargs = {
     'acktr': {},
     'acer': {},
     'ppo2': {'nminibatches': 1, 'nsteps': 10},
+    'ppo_c': {'nminibatches': 1, 'nsteps': 10},
     'trpo_mpi': {},
 }
 
