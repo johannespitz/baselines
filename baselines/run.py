@@ -194,9 +194,11 @@ def parse_cmdline_kwargs(args):
     return {k: parse(v) for k,v in parse_unknown_args(args).items()}
 
 
-def configure_logger(log_path, **kwargs):
+def configure_logger(log_path, format_strs=None, **kwargs):
     if log_path is not None:
         logger.configure(log_path)
+        if format_strs is not None:
+            logger.configure(log_path, format_strs)
     else:
         logger.configure(**kwargs)
 
@@ -210,7 +212,7 @@ def main(args):
 
     if MPI is None or MPI.COMM_WORLD.Get_rank() == 0:
         rank = 0
-        configure_logger(args.log_path)
+        configure_logger(args.log_path, args.format_strs.split(','))
     else:
         rank = MPI.COMM_WORLD.Get_rank()
         configure_logger(args.log_path, format_strs=[])

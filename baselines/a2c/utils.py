@@ -62,6 +62,22 @@ def fc(x, scope, nh, *, init_scale=1.0, init_bias=0.0):
         b = tf.get_variable("b", [nh], initializer=tf.constant_initializer(init_bias))
         return tf.matmul(x, w)+b
 
+def dense_with_dropout(x, scope, *, nh=256, nout=1, nlayer=3, init_scale=1.0, init_bias=0.0, rate=0.5):
+    assert nlayer > 1
+    with tf.variable_scope(scope):
+        for l in range(nlayer - 1):
+            if l == 0:
+                t = x
+                nin = x.get_shape()[1].value
+            else:
+                nin = nh
+            w = tf.get_variable("w_" + str(l), [nin, nh], initializer=ortho_init(init_scale))
+            b = tf.get_variable("b_" + str(l), [nh], initializer=tf.constant_initializer(init_bias))
+            t = tf.nn.dropout(tf.matmul(t, w) + b, rate=rate)
+        w = tf.get_variable("w_out", [nh, nout], initializer=ortho_init(init_scale))
+        b = tf.get_variable("b_out", [nout], initializer=tf.constant_initializer(init_bias))
+        return tf.matmul(t, w) + b
+
 def batch_to_seq(h, nbatch, nsteps, flat=False):
     if flat:
         h = tf.reshape(h, [nbatch, nsteps])

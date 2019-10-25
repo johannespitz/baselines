@@ -130,6 +130,9 @@ class Model(object):
         if MPI is not None:
             sync_from_root(sess, global_variables, comm=comm) #pylint: disable=E1101
 
+        writer = tf.summary.FileWriter('/home_local/pitz_ja/graphs', sess.graph)
+        writer.flush()
+
     def train(self, lr, cliprange, obs, returns, masks, actions, values, neglogpacs, states=None):
         # Here we calculate advantage A(s,a) = R + yV(s') - V(s)
         # Returns = R + yV(s')

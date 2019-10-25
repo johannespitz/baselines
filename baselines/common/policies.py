@@ -1,6 +1,7 @@
 import tensorflow as tf
 from baselines.common import tf_util
 from baselines.a2c.utils import fc
+from baselines.a2c.utils import dense_with_dropout
 from baselines.common.distributions import make_pdtype
 from baselines.common.input import observation_placeholder, encode_observation
 from baselines.common.tf_util import adjust_shape
@@ -15,7 +16,7 @@ class PolicyWithValue(object):
     Encapsulates fields and methods for RL policy and value function estimation with shared parameters
     """
 
-    def __init__(self, env, observations, latent, estimate_q=False, vf_latent=None, sess=None, **tensors):
+    def __init__(self, env, observations, latent, estimate_q=False, mc_dropout=False, vf_latent=None, sess=None, **tensors):
         """
         Parameters:
         ----------
@@ -59,9 +60,15 @@ class PolicyWithValue(object):
             assert isinstance(env.action_space, gym.spaces.Discrete)
             self.q = fc(vf_latent, 'q', env.action_space.n)
             self.vf = self.q
+        if mc_dropout:
+            self.vf = dense_with_dropout(vf_latent, 'vf', nh=256, nout=1, nlayer=3)
+            self.vf = self.vf[:, 0]
+            print("with dropout")
+            # somehow do multiple runs here and then save self.value_means and self.value_vars
         else:
             self.vf = fc(vf_latent, 'vf', 1)
             self.vf = self.vf[:,0]
+            print("no dropout")
 
     def _evaluate(self, variables, observation, **extra_feed):
         sess = self.sess
@@ -118,7 +125,7 @@ class PolicyWithValue(object):
     def load(self, load_path):
         tf_util.load_state(load_path, sess=self.sess)
 
-def build_policy(env, policy_network, value_network=None,  normalize_observations=False, estimate_q=False, **policy_kwargs):
+def build_policy(env, policy_network, value_network=None,  normalize_observations=False, estimate_q=False, mc_dropout=False, **policy_kwargs):
     if isinstance(policy_network, str):
         network_type = policy_network
         policy_network = get_network_builder(network_type)(**policy_kwargs)
@@ -172,6 +179,7 @@ def build_policy(env, policy_network, value_network=None,  normalize_observation
             vf_latent=vf_latent,
             sess=sess,
             estimate_q=estimate_q,
+            mc_dropout=mc_dropout,
             **extra_tensors
         )
         return policy
